@@ -11,6 +11,9 @@ function Game(canvas) {
         if (e.keyCode === 37) {
             self.pixx.left();
             return false;
+        } else if (e.keyCode === 38) {
+            self.pixx.jump();
+            return false;
         } else if (e.keyCode === 39) {
             self.pixx.right();
             return false;
@@ -21,6 +24,9 @@ function Game(canvas) {
     var keyUp = function(e) {
         if (e.keyCode === 37) {
             self.pixx.right();
+            return false;
+        } else if (e.keyCode === 38) {
+            self.pixx.stopJump();
             return false;
         } else if (e.keyCode === 39) {
             self.pixx.left();
@@ -61,11 +67,13 @@ function Pixx(x, y) {
     this.x = x;
     this.y = y;
     this.speed = 0;
+    this.yspeed = 5;
+    this.size = 4;
 }
 
 Pixx.prototype.drawIt = function(ctx) {
     ctx.fillStyle = "#aaa";
-    ctx.fillRect(this.x, this.y, 2, 2);
+    ctx.fillRect(this.x, this.y, this.size, this.size);
 }
 
 Pixx.prototype.left = function() {
@@ -76,20 +84,40 @@ Pixx.prototype.right = function() {
     this.speed += 4;
 }
 
+Pixx.prototype.jump = function() {
+    if (!this.jumping) {
+        this.yspeed = -10;
+        this.jumping = true;
+    }
+}
+
+Pixx.prototype.stopJump = function() {
+    if (this.yspeed < 0) {
+        this.yspeed = 0;
+    }
+}
+
 Pixx.prototype.update = function() {
     this.x += this.speed;
-    if (this.y < 480) {
-        this.y += 5;
-        if (this.y > 479) {
-            this.y = 479;
+    this.y += this.yspeed;
+
+    if (this.yspeed < 5) {
+        this.yspeed += 1;
+    }
+
+    if (this.y > (480-this.size)) {
+        this.y = (480-this.size);
+        if (this.jumping) {
+            this.jumping = false;
         }
     }
+
     if (this.x < 0) {
         this.x = 0;
     }
 
-    if (this.x > 640) {
-        this.x = 640;
+    if (this.x > (640-this.size)) {
+        this.x = (640-this.size);
     }
 }
 
