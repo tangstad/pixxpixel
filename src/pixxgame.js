@@ -2,14 +2,41 @@
 const FPS = 50;
 
 function Game(canvas) {
+    var self = this;
     this.canvas = canvas;
     this.context2D = canvas.getContext('2d');
-    this.pixx = new Pixx(50, 50);
+    this.pixx = new Pixx(50, 400);
+
+    var keyDown = function(e) {
+        if (e.keyCode === 37) {
+            self.pixx.left();
+            return false;
+        } else if (e.keyCode === 39) {
+            self.pixx.right();
+            return false;
+        }
+        return true;
+    }
+
+    var keyUp = function(e) {
+        if (e.keyCode === 37) {
+            self.pixx.right();
+            return false;
+        } else if (e.keyCode === 39) {
+            self.pixx.left();
+            return false;
+        }
+        return true;
+    }
+
+    document.onkeydown = keyDown;
+    document.onkeyup = keyUp;
 }
 
 Game.prototype.loop = function()
 {
     this.drawBackground();
+    this.pixx.update();
     this.pixx.drawIt(this.context2D);
 }
 
@@ -33,11 +60,37 @@ Game.prototype.fillBackground = function(color)
 function Pixx(x, y) {
     this.x = x;
     this.y = y;
+    this.speed = 0;
 }
 
 Pixx.prototype.drawIt = function(ctx) {
     ctx.fillStyle = "#aaa";
-    ctx.fillRect(this.x, this.y, 1, 1);
+    ctx.fillRect(this.x, this.y, 2, 2);
+}
+
+Pixx.prototype.left = function() {
+    this.speed -= 4;
+}
+
+Pixx.prototype.right = function() {
+    this.speed += 4;
+}
+
+Pixx.prototype.update = function() {
+    this.x += this.speed;
+    if (this.y < 480) {
+        this.y += 5;
+        if (this.y > 479) {
+            this.y = 479;
+        }
+    }
+    if (this.x < 0) {
+        this.x = 0;
+    }
+
+    if (this.x > 640) {
+        this.x = 640;
+    }
 }
 
 window.onload = init;
