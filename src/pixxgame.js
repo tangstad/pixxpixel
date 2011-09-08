@@ -6,6 +6,7 @@ function Game(canvas) {
     this.canvas = canvas;
     this.context2D = canvas.getContext('2d');
     this.pixx = new Pixx(50, 400);
+    this.platform = { x: 50, y: 450, width: 200 };
 
     var keyDown = function(e) {
         if (e.keyCode === 37) {
@@ -44,7 +45,7 @@ function Game(canvas) {
 Game.prototype.loop = function()
 {
     this.drawBackground();
-    this.pixx.update();
+    this.pixx.update(this.platform);
     this.pixx.drawIt(this.context2D);
 }
 
@@ -99,15 +100,14 @@ Pixx.prototype.stopJump = function() {
     }
 }
 
-Pixx.prototype.update = function() {
+Pixx.prototype.update = function(platform) {
     var oldy = this.y;
     this.x += this.speed;
     this.y += this.yspeed;
 
-    if (this.x > 50 && this.x < 250) {
-        var platform_y = 440;
-        if (oldy <= platform_y && this.y >= platform_y) {
-            this.y = platform_y;
+    if (this.x > platform.x && this.x < (platform.x + platform.width)) {
+        if (oldy <= platform.y && this.y >= platform.y) {
+            this.y = platform.y;
             this.jumping = false;
         }
     }
