@@ -101,9 +101,8 @@ Pixx.prototype.right = function() {
 }
 
 Pixx.prototype.jump = function() {
-    if (!this.jumping) {
+    if (this.onground) {
         this.yspeed = -10;
-        this.jumping = true;
     }
 }
 
@@ -126,13 +125,14 @@ Pixx.prototype.update = function(platforms) {
         this.x = (640-this.size);
     }
 
+    this.onground = false;
     for (var i=0; i<platforms.length; i++) {
         var platform = platforms[i];
         if (this.x >= (platform.x - this.size) &&
             this.x <= (platform.x + platform.width)) {
             if (oldy <= platform.y && this.y >= platform.y) {
                 this.y = platform.y;
-                this.jumping = false;
+                this.onground = true;
             }
         }
     }
