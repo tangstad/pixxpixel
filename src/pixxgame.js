@@ -46,6 +46,7 @@ function Game(canvas) {
 Game.prototype.loop = function()
 {
     this.drawBackground();
+    this.drawPlatforms();
     this.pixx.update(this.platforms);
     this.pixx.drawIt(this.context2D);
 }
@@ -59,6 +60,15 @@ Game.prototype.drawBackground = function()
 Game.prototype.clearBackground = function()
 {
     this.context2D.clearRect(0, 0, this.canvas.width, this.canvas.height);
+}
+
+Game.prototype.drawPlatforms = function()
+{
+    for (var i=0; i<this.platforms.length; i++) {
+        var platform = this.platforms[i];
+        this.context2D.fillStyle = "#555";
+        this.context2D.fillRect(platform.x, platform.y, platform.width, 1);
+    }
 }
 
 Game.prototype.fillBackground = function(color)
