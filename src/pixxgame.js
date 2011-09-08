@@ -102,7 +102,7 @@ Pixx.prototype.right = function() {
 
 Pixx.prototype.jump = function() {
     if (this.onground) {
-        this.yspeed = -10;
+        this.yspeed = -Game.impulse;
     }
 }
 
@@ -113,6 +113,9 @@ Pixx.prototype.stopJump = function() {
 }
 
 Pixx.prototype.update = function(platforms) {
+
+    this.yspeed += Game.gravity;
+
     var oldy = this.y;
     this.x += this.speed;
     this.y += this.yspeed;
@@ -133,14 +136,14 @@ Pixx.prototype.update = function(platforms) {
             if (oldy <= platform.y && this.y >= platform.y) {
                 this.y = platform.y;
                 this.onground = true;
+                this.yspeed = 0;
             }
         }
     }
-
-    if (this.yspeed < 5) {
-        this.yspeed += 1;
-    }
 }
+
+Game.gravity = 0.8;
+Game.impulse = 10;
 
 window.onload = init;
 window.onresize = init;
