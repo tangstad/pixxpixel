@@ -7,6 +7,8 @@ function Game(canvas) {
     this.context2D = canvas.getContext('2d');
     this.pixx = new Pixx(50, 400);
     this.platforms = [{ x: 50, y: 450, width: 200 },
+                      { x: 280, y: 400, width: 40 },
+                      // ground:
                       { x: 0, y: 480, width: 640 }];
 
     var keyDown = function(e) {
