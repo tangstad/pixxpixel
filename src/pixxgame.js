@@ -6,7 +6,8 @@ function Game(canvas) {
     this.canvas = canvas;
     this.context2D = canvas.getContext('2d');
     this.pixx = new Pixx(50, 400);
-    this.platform = { x: 50, y: 450, width: 200 };
+    this.platforms = [{ x: 50, y: 450, width: 200 },
+                      { x: 0, y: 480, width: 640 }];
 
     var keyDown = function(e) {
         if (e.keyCode === 37) {
@@ -45,7 +46,7 @@ function Game(canvas) {
 Game.prototype.loop = function()
 {
     this.drawBackground();
-    this.pixx.update(this.platform);
+    this.pixx.update(this.platforms);
     this.pixx.drawIt(this.context2D);
 }
 
@@ -76,7 +77,7 @@ function Pixx(x, y) {
 
 Pixx.prototype.drawIt = function(ctx) {
     ctx.fillStyle = "#aaa";
-    ctx.fillRect(this.x, this.y, this.size, this.size);
+    ctx.fillRect(this.x, this.y-this.size, this.size, this.size);
 }
 
 Pixx.prototype.left = function() {
@@ -100,28 +101,10 @@ Pixx.prototype.stopJump = function() {
     }
 }
 
-Pixx.prototype.update = function(platform) {
+Pixx.prototype.update = function(platforms) {
     var oldy = this.y;
     this.x += this.speed;
     this.y += this.yspeed;
-
-    if (this.x > platform.x && this.x < (platform.x + platform.width)) {
-        if (oldy <= platform.y && this.y >= platform.y) {
-            this.y = platform.y;
-            this.jumping = false;
-        }
-    }
-
-    if (this.yspeed < 5) {
-        this.yspeed += 1;
-    }
-
-    if (this.y > (480-this.size)) {
-        this.y = (480-this.size);
-        if (this.jumping) {
-            this.jumping = false;
-        }
-    }
 
     if (this.x < 0) {
         this.x = 0;
@@ -129,6 +112,20 @@ Pixx.prototype.update = function(platform) {
 
     if (this.x > (640-this.size)) {
         this.x = (640-this.size);
+    }
+
+    for (var i=0; i<platforms.length; i++) {
+        var platform = platforms[i];
+        if (this.x >= platform.x && this.x <= (platform.x + platform.width)) {
+            if (oldy <= platform.y && this.y >= platform.y) {
+                this.y = platform.y;
+                this.jumping = false;
+            }
+        }
+    }
+
+    if (this.yspeed < 5) {
+        this.yspeed += 1;
     }
 }
 
