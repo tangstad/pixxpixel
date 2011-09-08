@@ -11,7 +11,8 @@ function Game(canvas) {
         if (e.keyCode === 37) {
             self.pixx.left();
             return false;
-        } else if (e.keyCode === 38) {
+        } else if (e.keyCode === 67) {
+            // 'c'
             self.pixx.jump();
             return false;
         } else if (e.keyCode === 39) {
@@ -25,7 +26,8 @@ function Game(canvas) {
         if (e.keyCode === 37) {
             self.pixx.right();
             return false;
-        } else if (e.keyCode === 38) {
+        } else if (e.keyCode === 67) {
+            // 'c'
             self.pixx.stopJump();
             return false;
         } else if (e.keyCode === 39) {
