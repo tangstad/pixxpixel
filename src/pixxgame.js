@@ -100,8 +100,17 @@ Pixx.prototype.stopJump = function() {
 }
 
 Pixx.prototype.update = function() {
+    var oldy = this.y;
     this.x += this.speed;
     this.y += this.yspeed;
+
+    if (this.x > 50 && this.x < 250) {
+        var platform_y = 440;
+        if (oldy <= platform_y && this.y >= platform_y) {
+            this.y = platform_y;
+            this.jumping = false;
+        }
+    }
 
     if (this.yspeed < 5) {
         this.yspeed += 1;
