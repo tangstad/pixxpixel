@@ -126,7 +126,8 @@ Pixx.prototype.update = function(platforms) {
 
     for (var i=0; i<platforms.length; i++) {
         var platform = platforms[i];
-        if (this.x >= platform.x && this.x <= (platform.x + platform.width)) {
+        if (this.x >= (platform.x - this.size) &&
+            this.x <= (platform.x + platform.width)) {
             if (oldy <= platform.y && this.y >= platform.y) {
                 this.y = platform.y;
                 this.jumping = false;
