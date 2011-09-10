@@ -7,6 +7,8 @@ function Enemy(startState) {
 
     // TODO: find better name than state for permanent attributes
     this.state = startState;
+    this.size = startState.size;
+    this.y = startState.y;
 }
 
 Enemy.prototype.update = function() {
@@ -101,11 +103,11 @@ Game.prototype.loop = function()
     }
 }
 
-Pixx.prototype.isHit = function(enemy) {
-    if (this.x > (enemy.x - enemy.state.size) &&
-        (this.x - this.size) < enemy.x &&
-        this.y > (enemy.state.y - enemy.state.size) &&
-        (this.y - this.size) < enemy.state.y) {
+Pixx.prototype.isHit = function(target) {
+    if (this.x > (target.x - target.size) &&
+        (this.x - this.size) < target.x &&
+        this.y > (target.y - target.size) &&
+        (this.y - this.size) < target.y) {
         return true;
     } else {
         return false;
