@@ -72,6 +72,14 @@ function Game(canvas) {
     document.onkeyup = keyUp;
 
     this.init = function() {
+        var makePointBalls = function() {
+            var balls = [];
+            for (var x=310; x<=490; x+=10) {
+               balls.push({x: x, y: 449, size: 2});
+            }
+            return balls;
+        };
+
         this.pixx = new Pixx(50, 400);
         this.enemies = [new Enemy({ xstart: 280, xend: 320, y: 400, speed: 1, size: 10}),
                         new Enemy({ xstart: 350, xend: 450, y: 450, speed: 2, size: 15})];
@@ -81,6 +89,7 @@ function Game(canvas) {
                           { x: 0, y: 480, width: 640 },
                           { x: 300, y: 450, width: 200, blocking: true },
                           { x: 600, y: 460, width: 40, blocking: true }];
+        this.pointBalls = makePointBalls();
         this.points = 0;
     };
 
@@ -92,6 +101,16 @@ Game.prototype.loop = function()
     this.drawBackground();
     this.drawPlatforms();
     this.pixx.update(this.platforms);
+
+    for (var i=this.pointBalls.length-1; i>=0; i--) {
+        var ball = this.pointBalls[i];
+        if (this.pixx.isHit(ball)) {
+            this.pointBalls.splice(i, 1);
+            this.points += 1;
+        }
+    }
+
+    this.drawPointballs();
     this.pixx.drawIt(this.context2D);
 
     for (var i=0; i<this.enemies.length; i++) {
@@ -105,6 +124,14 @@ Game.prototype.loop = function()
 
     this.drawPoints();
 }
+
+Game.prototype.drawPointballs = function() {
+    for (var i=0; i<this.pointBalls.length; i++) {
+        var ball = this.pointBalls[i];
+        this.context2D.fillStyle = "#00f";
+        this.context2D.fillRect(ball.x, ball.y-ball.size, ball.size, ball.size);
+    }
+};
 
 Game.prototype.drawPoints = function() {
     var pad = function(number, digits) {
