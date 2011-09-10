@@ -81,6 +81,7 @@ function Game(canvas) {
                           { x: 0, y: 480, width: 640 },
                           { x: 300, y: 450, width: 200, blocking: true },
                           { x: 600, y: 460, width: 40, blocking: true }];
+        this.points = 0;
     };
 
     this.init();
@@ -101,7 +102,27 @@ Game.prototype.loop = function()
             this.init();
         }
     }
+
+    this.drawPoints();
 }
+
+Game.prototype.drawPoints = function() {
+    var pad = function(number, digits) {
+        var str = '' + number;
+        while (str.length < digits) {
+            str = '0' + str;
+        }
+        return str;
+    };
+
+    this.context2D.fillStyle = "#aaa";
+    this.context2D.textBaseline = 'top';
+    this.context2D.textAlign = 'right';
+    this.context2D.font = 'bold 24px courier new';
+    var margin = 10;
+    this.context2D.fillText(pad(this.points, 6),
+                            this.canvas.width - margin, margin);
+};
 
 Pixx.prototype.isHit = function(target) {
     if (this.x > (target.x - target.size) &&
