@@ -71,7 +71,8 @@ function Game(canvas) {
 
     this.init = function() {
         this.pixx = new Pixx(50, 400);
-        this.enemy = new Enemy({ xstart: 280, xend: 320, y: 400, speed: 1, size: 10});
+        this.enemies = [new Enemy({ xstart: 280, xend: 320, y: 400, speed: 1, size: 10}),
+                        new Enemy({ xstart: 350, xend: 450, y: 450, speed: 2, size: 15})];
         this.platforms = [{ x: 50, y: 450, width: 200 },
                           { x: 280, y: 400, width: 40 },
                           // ground:
@@ -89,11 +90,14 @@ Game.prototype.loop = function()
     this.drawPlatforms();
     this.pixx.update(this.platforms);
     this.pixx.drawIt(this.context2D);
-    this.enemy.update();
-    this.enemy.drawIt(this.context2D);
 
-    if (this.pixx.isHit(this.enemy)) {
-        this.init();
+    for (var i=0; i<this.enemies.length; i++) {
+        var enemy = this.enemies[i];
+        enemy.update();
+        enemy.drawIt(this.context2D);
+        if (this.pixx.isHit(enemy)) {
+            this.init();
+        }
     }
 }
 
