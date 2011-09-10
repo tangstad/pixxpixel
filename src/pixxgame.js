@@ -1,17 +1,40 @@
 // target frames per second
 const FPS = 50;
 
+function Enemy(startState) {
+    this.x = startState.xstart;
+    this.going_right = true;
+
+    // TODO: find better name than state for permanent attributes
+    this.state = startState;
+}
+
+Enemy.prototype.update = function() {
+    if (this.going_right) {
+        this.x += this.state.speed;
+        if (this.x >= (this.state.xend - this.state.size)) {
+            this.x = (this.state.xend - this.state.size);
+            this.going_right = false;
+        }
+    } else {
+        this.x -= this.state.speed;
+        if (this.x <= this.state.xstart)
+        {
+            this.x = this.state.xstart;
+            this.going_right = true;
+        }
+    }
+};
+
+Enemy.prototype.drawIt = function(ctx) {
+    ctx.fillStyle = "#f55";
+    ctx.fillRect(this.x, this.state.y-this.state.size, this.state.size, this.state.size);
+};
+
 function Game(canvas) {
     var self = this;
     this.canvas = canvas;
     this.context2D = canvas.getContext('2d');
-    this.pixx = new Pixx(50, 400);
-    this.platforms = [{ x: 50, y: 450, width: 200 },
-                      { x: 280, y: 400, width: 40 },
-                      // ground:
-                      { x: 0, y: 480, width: 640 },
-                      { x: 300, y: 450, width: 200, blocking: true },
-                      { x: 600, y: 460, width: 40, blocking: true }];
 
     var keyDown = function(e) {
         if (e.keyCode === 37) {
@@ -45,6 +68,19 @@ function Game(canvas) {
 
     document.onkeydown = keyDown;
     document.onkeyup = keyUp;
+
+    this.init = function() {
+        this.pixx = new Pixx(50, 400);
+        this.enemy = new Enemy({ xstart: 280, xend: 320, y: 400, speed: 1, size: 10});
+        this.platforms = [{ x: 50, y: 450, width: 200 },
+                          { x: 280, y: 400, width: 40 },
+                          // ground:
+                          { x: 0, y: 480, width: 640 },
+                          { x: 300, y: 450, width: 200, blocking: true },
+                          { x: 600, y: 460, width: 40, blocking: true }];
+    };
+
+    this.init();
 }
 
 Game.prototype.loop = function()
@@ -53,7 +89,24 @@ Game.prototype.loop = function()
     this.drawPlatforms();
     this.pixx.update(this.platforms);
     this.pixx.drawIt(this.context2D);
+    this.enemy.update();
+    this.enemy.drawIt(this.context2D);
+
+    if (this.pixx.isHit(this.enemy)) {
+        this.init();
+    }
 }
+
+Pixx.prototype.isHit = function(enemy) {
+    if (this.x > (enemy.x - enemy.state.size) &&
+        (this.x - this.size) < enemy.x &&
+        this.y > (enemy.state.y - enemy.state.size) &&
+        (this.y - this.size) < enemy.state.y) {
+        return true;
+    } else {
+        return false;
+    }
+};
 
 Game.prototype.drawBackground = function()
 {
