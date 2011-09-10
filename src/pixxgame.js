@@ -6,6 +6,12 @@ function Game(canvas) {
     this.canvas = canvas;
     this.context2D = canvas.getContext('2d');
     this.pixx = new Pixx(50, 400);
+    this.platforms = [{ x: 50, y: 450, width: 200 },
+                      { x: 280, y: 400, width: 40 },
+                      // ground:
+                      { x: 0, y: 480, width: 640 },
+                      { x: 300, y: 450, width: 200, blocking: true },
+                      { x: 600, y: 460, width: 40, blocking: true }];
 
     var keyDown = function(e) {
         if (e.keyCode === 37) {
@@ -44,7 +50,8 @@ function Game(canvas) {
 Game.prototype.loop = function()
 {
     this.drawBackground();
-    this.pixx.update();
+    this.drawPlatforms();
+    this.pixx.update(this.platforms);
     this.pixx.drawIt(this.context2D);
 }
 
@@ -57,6 +64,15 @@ Game.prototype.drawBackground = function()
 Game.prototype.clearBackground = function()
 {
     this.context2D.clearRect(0, 0, this.canvas.width, this.canvas.height);
+}
+
+Game.prototype.drawPlatforms = function()
+{
+    for (var i=0; i<this.platforms.length; i++) {
+        var platform = this.platforms[i];
+        this.context2D.fillStyle = platform.blocking ? "#aaa" : "#555";
+        this.context2D.fillRect(platform.x, platform.y, platform.width, 1);
+    }
 }
 
 Game.prototype.fillBackground = function(color)
@@ -75,7 +91,7 @@ function Pixx(x, y) {
 
 Pixx.prototype.drawIt = function(ctx) {
     ctx.fillStyle = "#aaa";
-    ctx.fillRect(this.x, this.y, this.size, this.size);
+    ctx.fillRect(this.x, this.y-this.size, this.size, this.size);
 }
 
 Pixx.prototype.left = function() {
@@ -87,9 +103,8 @@ Pixx.prototype.right = function() {
 }
 
 Pixx.prototype.jump = function() {
-    if (!this.jumping) {
-        this.yspeed = -10;
-        this.jumping = true;
+    if (this.onground) {
+        this.yspeed = -Game.impulse;
     }
 }
 
@@ -99,20 +114,13 @@ Pixx.prototype.stopJump = function() {
     }
 }
 
-Pixx.prototype.update = function() {
+Pixx.prototype.update = function(platforms) {
+
+    this.yspeed += Game.gravity;
+
+    var oldy = this.y;
     this.x += this.speed;
     this.y += this.yspeed;
-
-    if (this.yspeed < 5) {
-        this.yspeed += 1;
-    }
-
-    if (this.y > (480-this.size)) {
-        this.y = (480-this.size);
-        if (this.jumping) {
-            this.jumping = false;
-        }
-    }
 
     if (this.x < 0) {
         this.x = 0;
@@ -121,7 +129,31 @@ Pixx.prototype.update = function() {
     if (this.x > (640-this.size)) {
         this.x = (640-this.size);
     }
+
+    this.onground = false;
+    for (var i=0; i<platforms.length; i++) {
+        var platform = platforms[i];
+
+        var x_inside = (this.x >= (platform.x - this.size) &&
+                        this.x <= (platform.x + platform.width));
+        if (x_inside) {
+            var from_top = (oldy <= platform.y && this.y >= platform.y);
+            var from_bottom = (oldy >= (platform.y + this.size) &&
+                              this.y <= (platform.y + this.size));
+            if (from_top) {
+                this.y = platform.y;
+                this.onground = true;
+                this.yspeed = 0;
+            } else if (platform.blocking && from_bottom) {
+                this.y = platform.y + this.size;
+                this.yspeed = 0;
+            }
+        }
+    }
 }
+
+Game.gravity = 0.8;
+Game.impulse = 10;
 
 window.onload = init;
 window.onresize = init;
