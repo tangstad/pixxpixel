@@ -9,7 +9,9 @@ function Game(canvas) {
     this.platforms = [{ x: 50, y: 450, width: 200 },
                       { x: 280, y: 400, width: 40 },
                       // ground:
-                      { x: 0, y: 480, width: 640 }];
+                      { x: 0, y: 480, width: 640 },
+                      { x: 300, y: 450, width: 200, blocking: true },
+                      { x: 600, y: 460, width: 40, blocking: true }];
 
     var keyDown = function(e) {
         if (e.keyCode === 37) {
@@ -68,7 +70,7 @@ Game.prototype.drawPlatforms = function()
 {
     for (var i=0; i<this.platforms.length; i++) {
         var platform = this.platforms[i];
-        this.context2D.fillStyle = "#555";
+        this.context2D.fillStyle = platform.blocking ? "#aaa" : "#555";
         this.context2D.fillRect(platform.x, platform.y, platform.width, 1);
     }
 }
@@ -137,8 +139,14 @@ Pixx.prototype.update = function(platforms) {
                 this.y = platform.y;
                 this.onground = true;
                 this.yspeed = 0;
+            } else if (platform.blocking &&
+                       oldy >= (platform.y + this.size) &&
+                       this.y <= (platform.y + this.size)) {
+                this.y = platform.y + this.size;
+                this.yspeed = 0;
             }
         }
+
     }
 }
 
