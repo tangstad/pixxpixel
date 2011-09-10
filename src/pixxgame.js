@@ -53,14 +53,14 @@ function Game(canvas) {
 
     var keyUp = function(e) {
         if (e.keyCode === 37) {
-            self.pixx.right();
+            self.pixx.noleft();
             return false;
         } else if (e.keyCode === 67) {
             // 'c'
             self.pixx.stopJump();
             return false;
         } else if (e.keyCode === 39) {
-            self.pixx.left();
+            self.pixx.noright();
             return false;
         }
         return true;
@@ -147,12 +147,31 @@ Pixx.prototype.drawIt = function(ctx) {
     ctx.fillRect(this.x, this.y-this.size, this.size, this.size);
 }
 
+function Direction() {}
+Direction.NONE = 0;
+Direction.LEFT = 1;
+Direction.RIGHT = 2;
+
 Pixx.prototype.left = function() {
-    this.speed -= 4;
+    this.speed = -4;
+}
+
+Pixx.prototype.noright = function() {
+    if (this.speed > 0)
+    {
+        this.speed = 0;
+    }
+}
+
+Pixx.prototype.noleft = function() {
+    if (this.speed < 0)
+    {
+        this.speed = 0;
+    }
 }
 
 Pixx.prototype.right = function() {
-    this.speed += 4;
+    this.speed = 4;
 }
 
 Pixx.prototype.jump = function() {
