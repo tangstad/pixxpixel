@@ -133,20 +133,22 @@ Pixx.prototype.update = function(platforms) {
     this.onground = false;
     for (var i=0; i<platforms.length; i++) {
         var platform = platforms[i];
-        if (this.x >= (platform.x - this.size) &&
-            this.x <= (platform.x + platform.width)) {
-            if (oldy <= platform.y && this.y >= platform.y) {
+
+        var x_inside = (this.x >= (platform.x - this.size) &&
+                        this.x <= (platform.x + platform.width));
+        if (x_inside) {
+            var from_top = (oldy <= platform.y && this.y >= platform.y);
+            var from_bottom = (oldy >= (platform.y + this.size) &&
+                              this.y <= (platform.y + this.size));
+            if (from_top) {
                 this.y = platform.y;
                 this.onground = true;
                 this.yspeed = 0;
-            } else if (platform.blocking &&
-                       oldy >= (platform.y + this.size) &&
-                       this.y <= (platform.y + this.size)) {
+            } else if (platform.blocking && from_bottom) {
                 this.y = platform.y + this.size;
                 this.yspeed = 0;
             }
         }
-
     }
 }
 
