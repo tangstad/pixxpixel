@@ -91,6 +91,7 @@ function Game(canvas) {
                           { x: 600, y: 460, width: 40, blocking: true }];
         this.pointBalls = makePointBalls();
         this.points = 0;
+        this.lives = 3;
     };
 
     this.init();
@@ -123,6 +124,7 @@ Game.prototype.loop = function()
     }
 
     this.drawPoints();
+    this.drawLives();
 }
 
 Game.prototype.drawPointballs = function() {
@@ -149,6 +151,15 @@ Game.prototype.drawPoints = function() {
     var margin = 10;
     this.context2D.fillText(pad(this.points, 6),
                             this.canvas.width - margin, margin);
+};
+
+Game.prototype.drawLives = function() {
+    this.context2D.fillStyle = "#aaa";
+    this.context2D.textBaseline = 'top';
+    this.context2D.textAlign = 'left';
+    this.context2D.font = 'bold 24px courier new';
+    var margin = 10;
+    this.context2D.fillText(this.lives, margin, margin);
 };
 
 Pixx.prototype.isHit = function(target) {
