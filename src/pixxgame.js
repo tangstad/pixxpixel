@@ -71,6 +71,12 @@ function Game(canvas) {
     document.onkeydown = keyDown;
     document.onkeyup = keyUp;
 
+    this.resetLevel = function() {
+        this.pixx = new Pixx(50, 400);
+        this.enemies = [new Enemy({ xstart: 280, xend: 320, y: 400, speed: 1, size: 10}),
+                        new Enemy({ xstart: 350, xend: 450, y: 450, speed: 2, size: 15})];
+    };
+
     this.init = function() {
         var makePointBalls = function() {
             var balls = [];
@@ -80,9 +86,6 @@ function Game(canvas) {
             return balls;
         };
 
-        this.pixx = new Pixx(50, 400);
-        this.enemies = [new Enemy({ xstart: 280, xend: 320, y: 400, speed: 1, size: 10}),
-                        new Enemy({ xstart: 350, xend: 450, y: 450, speed: 2, size: 15})];
         this.platforms = [{ x: 50, y: 450, width: 200 },
                           { x: 280, y: 400, width: 40 },
                           // ground:
@@ -92,6 +95,7 @@ function Game(canvas) {
         this.pointBalls = makePointBalls();
         this.points = 0;
         this.lives = 3;
+        this.resetLevel();
     };
 
     this.init();
@@ -119,7 +123,12 @@ Game.prototype.loop = function()
         enemy.update();
         enemy.drawIt(this.context2D);
         if (this.pixx.isHit(enemy)) {
-            this.init();
+            this.lives -= 1;
+            if (this.lives === 0) {
+                this.init();
+            } else {
+                this.resetLevel();
+            }
         }
     }
 
