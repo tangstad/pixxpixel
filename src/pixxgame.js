@@ -37,6 +37,7 @@ function Game(canvas) {
     var self = this;
     this.canvas = canvas;
     this.context2D = canvas.getContext('2d');
+    this.highscore = 0;
 
     var keyDown = function(e) {
         if (self.onTitleScreen) {
@@ -124,6 +125,7 @@ Game.prototype.loop = function()
 
 Game.prototype.drawTitle = function() {
     this.drawBackground();
+    this.drawHighscore();
     this.context2D.fillStyle = "#aaa";
     this.context2D.textBaseline = 'top';
     this.context2D.textAlign = 'center';
@@ -156,6 +158,9 @@ Game.prototype.drawGame = function() {
         if (this.pixx.isHit(enemy)) {
             this.lives -= 1;
             if (this.lives === 0) {
+                if (this.points > this.highscore) {
+                    this.highscore = this.points;
+                }
                 this.init();
             } else {
                 this.resetLevel();
@@ -165,6 +170,7 @@ Game.prototype.drawGame = function() {
 
     this.drawPoints();
     this.drawLives();
+    this.drawHighscore();
 }
 
 Game.prototype.drawPointballs = function() {
@@ -191,6 +197,23 @@ Game.prototype.drawPoints = function() {
     var margin = 10;
     this.context2D.fillText(pad(this.points, 6),
                             this.canvas.width - margin, margin);
+};
+
+Game.prototype.drawHighscore = function() {
+    var pad = function(number, digits) {
+        var str = '' + number;
+        while (str.length < digits) {
+            str = '0' + str;
+        }
+        return str;
+    };
+
+    this.context2D.fillStyle = "#555";
+    this.context2D.textBaseline = 'top';
+    this.context2D.textAlign = 'center';
+    this.context2D.font = 'bold 24px courier new';
+    var margin = 10;
+    this.context2D.fillText(pad(this.highscore, 6), this.canvas.width / 2, margin);
 };
 
 Game.prototype.drawLives = function() {
