@@ -39,6 +39,15 @@ function Game(canvas) {
     this.context2D = canvas.getContext('2d');
 
     var keyDown = function(e) {
+        if (self.onTitleScreen) {
+            if (e.keyCode === 67) {
+                self.onTitleScreen = false;
+                return false;
+            } else {
+                return true;
+            }
+        }
+
         if (e.keyCode === 37) {
             self.pixx.left();
             return false;
@@ -54,6 +63,8 @@ function Game(canvas) {
     }
 
     var keyUp = function(e) {
+        if (self.onTitleScreen) return true;
+
         if (e.keyCode === 37) {
             self.pixx.noleft();
             return false;
@@ -96,6 +107,7 @@ function Game(canvas) {
         this.points = 0;
         this.lives = 3;
         this.resetLevel();
+        this.onTitleScreen = true;
     };
 
     this.init();
@@ -103,6 +115,25 @@ function Game(canvas) {
 
 Game.prototype.loop = function()
 {
+    if (this.onTitleScreen) {
+        this.drawTitle();
+    } else {
+        this.drawGame();
+    }
+};
+
+Game.prototype.drawTitle = function() {
+    this.drawBackground();
+    this.context2D.fillStyle = "#aaa";
+    this.context2D.textBaseline = 'top';
+    this.context2D.textAlign = 'center';
+    this.context2D.font = 'bold 24px courier new';
+    this.context2D.fillText("Pixx Pixel in Line Land", this.canvas.width / 2, this.canvas.height / 3);
+    this.context2D.font = 'bold 18px courier new';
+    this.context2D.fillText("Push 'c' to start", this.canvas.width / 2, (this.canvas.height*2) / 3);
+};
+
+Game.prototype.drawGame = function() {
     this.drawBackground();
     this.drawPlatforms();
     this.pixx.update(this.platforms);
