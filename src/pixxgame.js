@@ -39,6 +39,15 @@ function Game(canvas) {
     this.context2D = canvas.getContext('2d');
 
     var keyDown = function(e) {
+        if (self.onTitleScreen) {
+            if (e.keyCode === 67) {
+                self.onTitleScreen = false;
+                return false;
+            } else {
+                return true;
+            }
+        }
+
         if (e.keyCode === 37) {
             self.pixx.left();
             return false;
@@ -54,6 +63,8 @@ function Game(canvas) {
     }
 
     var keyUp = function(e) {
+        if (self.onTitleScreen) return true;
+
         if (e.keyCode === 37) {
             self.pixx.noleft();
             return false;
@@ -71,6 +82,12 @@ function Game(canvas) {
     document.onkeydown = keyDown;
     document.onkeyup = keyUp;
 
+    this.resetLevel = function() {
+        this.pixx = new Pixx(50, 400);
+        this.enemies = [new Enemy({ xstart: 280, xend: 320, y: 400, speed: 1, size: 10}),
+                        new Enemy({ xstart: 350, xend: 450, y: 450, speed: 2, size: 15})];
+    };
+
     this.init = function() {
         var makePointBalls = function() {
             var balls = [];
@@ -80,9 +97,6 @@ function Game(canvas) {
             return balls;
         };
 
-        this.pixx = new Pixx(50, 400);
-        this.enemies = [new Enemy({ xstart: 280, xend: 320, y: 400, speed: 1, size: 10}),
-                        new Enemy({ xstart: 350, xend: 450, y: 450, speed: 2, size: 15})];
         this.platforms = [{ x: 50, y: 450, width: 200 },
                           { x: 280, y: 400, width: 40 },
                           // ground:
@@ -91,6 +105,9 @@ function Game(canvas) {
                           { x: 600, y: 460, width: 40, blocking: true }];
         this.pointBalls = makePointBalls();
         this.points = 0;
+        this.lives = 3;
+        this.resetLevel();
+        this.onTitleScreen = true;
     };
 
     this.init();
@@ -98,6 +115,25 @@ function Game(canvas) {
 
 Game.prototype.loop = function()
 {
+    if (this.onTitleScreen) {
+        this.drawTitle();
+    } else {
+        this.drawGame();
+    }
+};
+
+Game.prototype.drawTitle = function() {
+    this.drawBackground();
+    this.context2D.fillStyle = "#aaa";
+    this.context2D.textBaseline = 'top';
+    this.context2D.textAlign = 'center';
+    this.context2D.font = 'bold 24px courier new';
+    this.context2D.fillText("Pixx Pixel in Line Land", this.canvas.width / 2, this.canvas.height / 3);
+    this.context2D.font = 'bold 18px courier new';
+    this.context2D.fillText("Push 'c' to start", this.canvas.width / 2, (this.canvas.height*2) / 3);
+};
+
+Game.prototype.drawGame = function() {
     this.drawBackground();
     this.drawPlatforms();
     this.pixx.update(this.platforms);
@@ -118,11 +154,17 @@ Game.prototype.loop = function()
         enemy.update();
         enemy.drawIt(this.context2D);
         if (this.pixx.isHit(enemy)) {
-            this.init();
+            this.lives -= 1;
+            if (this.lives === 0) {
+                this.init();
+            } else {
+                this.resetLevel();
+            }
         }
     }
 
     this.drawPoints();
+    this.drawLives();
 }
 
 Game.prototype.drawPointballs = function() {
@@ -149,6 +191,15 @@ Game.prototype.drawPoints = function() {
     var margin = 10;
     this.context2D.fillText(pad(this.points, 6),
                             this.canvas.width - margin, margin);
+};
+
+Game.prototype.drawLives = function() {
+    this.context2D.fillStyle = "#aaa";
+    this.context2D.textBaseline = 'top';
+    this.context2D.textAlign = 'left';
+    this.context2D.font = 'bold 24px courier new';
+    var margin = 10;
+    this.context2D.fillText(this.lives, margin, margin);
 };
 
 Pixx.prototype.isHit = function(target) {
