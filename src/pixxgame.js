@@ -356,7 +356,6 @@ Game.gravity = 0.8;
 Game.impulse = 10;
 
 window.onload = init;
-window.onresize = init;
 
 function init()
 {
