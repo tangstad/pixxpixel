@@ -226,9 +226,9 @@ Game.prototype.drawLives = function() {
 };
 
 Pixx.prototype.isHit = function(target) {
-    if (this.x > (target.x - target.size) &&
-        (this.x - this.size) < target.x &&
-        this.y > (target.y - target.size) &&
+    if ((this.x + this.size) > target.x &&
+        this.x < (target.x + target.size) &&
+        this.y  > (target.y - target.size) &&
         (this.y - this.size) < target.y) {
         return true;
     } else {
