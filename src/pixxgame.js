@@ -176,7 +176,7 @@ Game.prototype.drawGame = function() {
 Game.prototype.drawPointballs = function() {
     for (var i=0; i<this.pointBalls.length; i++) {
         var ball = this.pointBalls[i];
-        this.context2D.fillStyle = "#00f";
+        this.context2D.fillStyle = "#0f0";
         this.context2D.fillRect(ball.x, ball.y-ball.size, ball.size, ball.size);
     }
 };
