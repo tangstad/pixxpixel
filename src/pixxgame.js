@@ -98,12 +98,12 @@ function Game(canvas) {
             return balls;
         };
 
-        this.platforms = [{ x: 50, y: 450, width: 200 },
-                          { x: 280, y: 400, width: 40 },
+        this.platforms = [new Platform({ x: 50, y: 450, width: 200 }),
+                          new Platform({ x: 280, y: 400, width: 40 }),
                           // ground:
-                          { x: 0, y: 480, width: 640 },
-                          { x: 300, y: 450, width: 200, blocking: true },
-                          { x: 600, y: 460, width: 40, blocking: true }];
+                          new Platform({ x: 0, y: 480, width: 640 }),
+                          new Platform({ x: 300, y: 450, width: 200, blocking: true }),
+                          new Platform({ x: 600, y: 460, width: 40, blocking: true })];
         this.pointBalls = makePointBalls();
         this.points = 0;
         this.lives = 3;
@@ -113,6 +113,18 @@ function Game(canvas) {
 
     this.init();
 }
+
+function Platform(state) {
+    this.x = state.x;
+    this.y = state.y;
+    this.width = state.width;
+    this.blocking = state.blocking;
+}
+
+Platform.prototype.drawIt = function(ctx) {
+    ctx.fillStyle = this.blocking ? "#aaa" : "#555";
+    ctx.fillRect(this.x, this.y, this.width, 1);
+};
 
 Game.prototype.loop = function()
 {
@@ -251,8 +263,7 @@ Game.prototype.drawPlatforms = function()
 {
     for (var i=0; i<this.platforms.length; i++) {
         var platform = this.platforms[i];
-        this.context2D.fillStyle = platform.blocking ? "#aaa" : "#555";
-        this.context2D.fillRect(platform.x, platform.y, platform.width, 1);
+        platform.drawIt(this.context2D);
     }
 }
 
