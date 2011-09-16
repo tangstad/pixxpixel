@@ -141,12 +141,20 @@ function MovingPlatform(state) {
 
 MovingPlatform.prototype.drawIt = Platform.prototype.drawIt;
 
-MovingPlatform.prototype.update = function() {
+MovingPlatform.prototype.update = function(pixx) {
     if (this.going_up) {
+        var oldy = this.y;
         this.y -= this.yspeed;
         if (this.y <= this.ystart) {
             this.y = this.ystart;
             this.going_up = false;
+        }
+
+        if (this.x <= pixx.x && (this.x + this.width) >= (pixx.x + pixx.size)) {
+            if  (pixx.y <= oldy && pixx.y >= this.y) {
+                pixx.y = this.y;
+                pixx.onground = true;
+            }
         }
     } else {
         this.y += this.yspeed;
@@ -294,7 +302,7 @@ Game.prototype.drawPlatforms = function()
 {
     for (var i=0; i<this.platforms.length; i++) {
         var platform = this.platforms[i];
-        platform.update();
+        platform.update(this.pixx);
         platform.drawIt(this.context2D);
     }
 }
