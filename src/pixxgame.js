@@ -103,7 +103,7 @@ function Game(canvas) {
                           // ground:
                           new Platform({ x: 0, y: 480, width: 640 }),
                           new Platform({ x: 300, y: 450, width: 200, blocking: true }),
-                          new Platform({ x: 600, y: 460, width: 40, blocking: true })];
+                          new MovingPlatform({ x: 600, y: 460, ystart: 400, yend: 460, yspeed: 2, width: 40, blocking: true })];
         this.pointBalls = makePointBalls();
         this.points = 0;
         this.lives = 3;
@@ -124,6 +124,37 @@ function Platform(state) {
 Platform.prototype.drawIt = function(ctx) {
     ctx.fillStyle = this.blocking ? "#aaa" : "#555";
     ctx.fillRect(this.x, this.y, this.width, 1);
+};
+
+Platform.prototype.update = function() {};
+
+function MovingPlatform(state) {
+    this.x = state.x;
+    this.y = state.y;
+    this.width = state.width;
+    this.blocking = state.blocking;
+    this.ystart = state.ystart;
+    this.yend = state.yend;
+    this.yspeed = state.yspeed;
+    this.going_up = true;
+}
+
+MovingPlatform.prototype.drawIt = Platform.prototype.drawIt;
+
+MovingPlatform.prototype.update = function() {
+    if (this.going_up) {
+        this.y -= this.yspeed;
+        if (this.y <= this.ystart) {
+            this.y = this.ystart;
+            this.going_up = false;
+        }
+    } else {
+        this.y += this.yspeed;
+        if (this.y >= this.yend) {
+            this.y = this.yend;
+            this.going_up = true;
+        }
+    }
 };
 
 Game.prototype.loop = function()
@@ -263,6 +294,7 @@ Game.prototype.drawPlatforms = function()
 {
     for (var i=0; i<this.platforms.length; i++) {
         var platform = this.platforms[i];
+        platform.update();
         platform.drawIt(this.context2D);
     }
 }
