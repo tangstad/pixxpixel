@@ -142,6 +142,8 @@ function MovingPlatform(state) {
 MovingPlatform.prototype.drawIt = Platform.prototype.drawIt;
 
 MovingPlatform.prototype.update = function(pixx) {
+    var oldy = this.y;
+
     if (this.going_up) {
         var oldy = this.y;
         this.y -= this.yspeed;
@@ -150,8 +152,9 @@ MovingPlatform.prototype.update = function(pixx) {
             this.going_up = false;
         }
 
+        // if we move through player, we push him up
         if (this.x <= pixx.x && (this.x + this.width) >= (pixx.x + pixx.size)) {
-            if  (pixx.y <= oldy && pixx.y >= this.y) {
+            if (pixx.y <= oldy && pixx.y >= this.y) {
                 pixx.y = this.y;
                 pixx.onground = true;
             }
@@ -161,6 +164,13 @@ MovingPlatform.prototype.update = function(pixx) {
         if (this.y >= this.yend) {
             this.y = this.yend;
             this.going_up = true;
+        }
+        // move player down with platform if he's already on it
+        if (this.x <= pixx.x && (this.x + this.width) >= (pixx.x + pixx.size)) {
+            if (pixx.y == oldy) {
+                pixx.y = this.y;
+                pixx.onground = true;
+            }
         }
     }
 };
