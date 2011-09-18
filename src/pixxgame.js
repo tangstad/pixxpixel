@@ -98,12 +98,13 @@ function Game(canvas) {
             return balls;
         };
 
-        this.platforms = [{ x: 50, y: 450, width: 200 },
-                          { x: 280, y: 400, width: 40 },
+        this.platforms = [new Platform({ x: 50, y: 450, width: 200 }),
+                          new Platform({ x: 280, y: 400, width: 40 }),
                           // ground:
-                          { x: 0, y: 480, width: 640 },
-                          { x: 300, y: 450, width: 200, blocking: true },
-                          { x: 600, y: 460, width: 40, blocking: true }];
+                          new Platform({ x: 0, y: 480, width: 640 }),
+                          new Platform({ x: 300, y: 450, width: 200, blocking: true }),
+                          new MovingPlatform({ x: 600, y: 460, ystart: 400, yend: 460, yspeed: 4, width: 40, blocking: true })];
+
         this.pointBalls = makePointBalls();
         this.points = 0;
         this.lives = 3;
@@ -113,6 +114,72 @@ function Game(canvas) {
 
     this.init();
 }
+
+function Platform(state) {
+    this.x = state.x;
+    this.y = state.y;
+    this.width = state.width;
+    this.blocking = state.blocking;
+}
+
+Platform.prototype.drawIt = function(ctx) {
+    ctx.fillStyle = this.blocking ? "#aaa" : "#555";
+    ctx.fillRect(this.x, this.y, this.width, 1);
+};
+
+Platform.prototype.update = function() {};
+
+function MovingPlatform(state) {
+    this.x = state.x;
+    this.y = state.y;
+    this.width = state.width;
+    this.blocking = state.blocking;
+    this.ystart = state.ystart;
+    this.yend = state.yend;
+    this.yspeed = state.yspeed;
+    this.going_up = true;
+}
+
+MovingPlatform.prototype.drawIt = Platform.prototype.drawIt;
+
+MovingPlatform.prototype.update = function(pixx) {
+    var oldy = this.y;
+
+    var x_inside = (pixx.x >= (this.x - pixx.size) &&
+                    pixx.x <= (this.x + this.width));
+    var pixx_was_above = pixx.y <= oldy;
+    var pixx_was_on_platform = pixx.y === oldy;
+
+    if (this.going_up) {
+        var oldy = this.y;
+        this.y -= this.yspeed;
+        if (this.y <= this.ystart) {
+            this.y = this.ystart;
+            this.going_up = false;
+        }
+    } else {
+        this.y += this.yspeed;
+        if (this.y >= this.yend) {
+            this.y = this.yend;
+            this.going_up = true;
+        }
+    }
+
+    var pixx_is_above = pixx.y <= this.y;
+
+    if (x_inside) {
+        if (pixx_was_on_platform) {
+            pixx.y = this.y;
+            pixx.onground = true;
+        } else if (pixx_was_above && !pixx_is_above) {
+            pixx.y = this.y;
+            pixx.onground = true;
+        } else if (this.blocking && !pixx_was_above && pixx_is_above) {
+            // push down or just block
+            pixx.y = this.y + pixx.size;
+        }
+    }
+};
 
 Game.prototype.loop = function()
 {
@@ -251,8 +318,8 @@ Game.prototype.drawPlatforms = function()
 {
     for (var i=0; i<this.platforms.length; i++) {
         var platform = this.platforms[i];
-        this.context2D.fillStyle = platform.blocking ? "#aaa" : "#555";
-        this.context2D.fillRect(platform.x, platform.y, platform.width, 1);
+        platform.update(this.pixx);
+        platform.drawIt(this.context2D);
     }
 }
 
@@ -338,8 +405,7 @@ Pixx.prototype.update = function(platforms) {
                         this.x <= (platform.x + platform.width));
         if (x_inside) {
             var from_top = (oldy <= platform.y && this.y >= platform.y);
-            var from_bottom = (oldy >= (platform.y + this.size) &&
-                              this.y <= (platform.y + this.size));
+            var from_bottom = (oldy > platform.y && this.y <= platform.y)
             if (from_top) {
                 this.y = platform.y;
                 this.onground = true;
