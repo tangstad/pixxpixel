@@ -105,6 +105,12 @@ function Game(canvas) {
                           new Platform({ x: 300, y: 450, width: 200, blocking: true }),
                           new MovingPlatform({ x: 600, y: 460, ystart: 400, yend: 460, yspeed: 4, width: 40, blocking: true })];
 
+        this.levelEnd = { x: 610, y: 380, size: 30 };
+        this.levelEnd.drawIt = function(ctx) {
+            ctx.fillStyle = "#8f8";
+            ctx.fillRect(this.x, this.y-this.size, this.size, this.size);
+        };
+
         this.pointBalls = makePointBalls();
         this.points = 0;
         this.lives = 3;
@@ -205,7 +211,15 @@ Game.prototype.drawTitle = function() {
 Game.prototype.drawGame = function() {
     this.drawBackground();
     this.drawPlatforms();
+    this.levelEnd.drawIt(this.context2D);
     this.pixx.update(this.platforms);
+
+    if (this.pixx.isHit(this.levelEnd)) {
+        if (this.points > this.highscore) {
+            this.highscore = this.points;
+        }
+        this.init();
+    }
 
     for (var i=this.pointBalls.length-1; i>=0; i--) {
         var ball = this.pointBalls[i];
